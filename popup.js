@@ -31,8 +31,6 @@ establishConnection(function (port) {
   });
 });
 
-
-
 function displayVariables(variables) {
   const variablesContainer = document.getElementById("variables-container");
   variablesContainer.innerHTML = ""; // Clear the container
