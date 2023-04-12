@@ -18,7 +18,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 function extractVariables(variables) {
   const userNameElement = document.querySelector(".pv-text-details__left-panel > div:first-child > h1");
-
   if (userNameElement) {
     const fullName = userNameElement.innerText.trim();
     const firstName = fullName.split(" ")[0];
@@ -33,7 +32,7 @@ function extractVariables(variables) {
   if (experienceSectionElement) {
     const companyElement = document.querySelector('a[data-field="experience_company_logo"] > div > div > img');
     if (companyElement) {
-      variables.CompanyName = companyElement.alt.split(' ').slice(0, -1).join(' ')
+      variables.CompanyName = companyElement.alt.split(' ').slice(0, -1).join(' ');
     }
     const positionElement = experienceSectionElement.querySelector('ul.pvs-list > li > div > div:nth-child(2) > div > div > div > span > span:first-child');
     if (positionElement) {
