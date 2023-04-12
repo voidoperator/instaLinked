@@ -21,13 +21,16 @@ function establishConnection(callback) {
 
 establishConnection(function (port) {
   port.postMessage({ action: "requestVariables" });
-
   port.onMessage.addListener(function (response) {
     if (response.action === "variablesResponse") {
-      displayVariables(response.variables);
+      chrome.storage.sync.get("customVariables", function (data) {
+        const allVariables = { ...response.variables, ...data.customVariables };
+        displayVariables(allVariables);
+      });
     }
   });
 });
+
 
 
 function displayVariables(variables) {
@@ -91,6 +94,7 @@ function addVariable(event) {
 
   const variableCheckbox = document.createElement("input");
   variableCheckbox.type = "checkbox";
+  variableCheckbox.checked = true;
   variableWrapper.appendChild(variableCheckbox);
 
   const variableLabel = document.createElement("input");
@@ -111,16 +115,14 @@ function generateMessage() {
   const variablesContainer = document.getElementById("variables-container");
   const variableWrappers = variablesContainer.querySelectorAll("div");
   const templateMessage = document.getElementById("template-message").value;
-  let modifiedMessage;
-
-  console.log(templateMessage)
+  let modifiedMessage = templateMessage || "";
 
   const defaultVariables = {
-    FullName: "",
-    FirstName: "",
-    LastName: "",
-    CompanyName: "",
-    Position: "",
+    TheirFullName: "",
+    TheirFirstName: "",
+    TheirLastName: "",
+    TheirCompanyName: "",
+    TheirPositionName: "",
   };
   const customVariables = {};
 
@@ -132,39 +134,26 @@ function generateMessage() {
       if (labelElement) {
         variableName = wrapper.querySelector("label").textContent.replace(":", "");
         variableValue = wrapper.querySelector("input[type='text']").value;
-        defaultVariables[variableName] = variableValue;
       } else {
         variableName = wrapper.querySelector("input[placeholder='Variable Name']").value;
         variableValue = wrapper.querySelector("input[placeholder='Variable Value']").value;
-        defaultVariables[variableName] = variableValue;
       }
+      // Replace all occurrences of the variable in the template message
+      const variablePattern = new RegExp(`{${variableName}}`, 'g');
+      modifiedMessage = modifiedMessage.replace(variablePattern, variableValue);
       // Save custom variables
       if (!Object.keys(defaultVariables).includes(variableName)) {
         customVariables[variableName] = variableValue;
       }
     }
-    modifiedMessage = templateMessage.replace(variableName, variableValue);
-    console.log(modifiedMessage)
   });
+
+  console.log('modifiedMessage', modifiedMessage)
 
   chrome.storage.sync.set({ templateMessage, customVariables }, function () {
-    window.alert("Template message and custom variables saved.");
-  });
-
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const port = chrome.tabs.connect(tabs[0].id, { name: "popup" });
-    port.postMessage({ action: "requestVariables" });
-    port.onMessage.addListener(function (response) {
-      if (response.action === "variablesResponse") {
-        chrome.storage.sync.get("customVariables", function (data) {
-          const allVariables = { ...response.variables, ...data.customVariables };
-          displayVariables(allVariables);
-        });
-      }
-    });
+    console.log("Template message and custom variables saved.");
   });
 }
-
 
 // Load the last saved template message
 chrome.storage.sync.get("templateMessage", function (data) {
