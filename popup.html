@@ -7,19 +7,47 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>LinkedInstant</title>
-    <!-- <style></style> -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        width: 500px;
+        height: 100%;
+      }
+      button {
+        margin-top: 10px;
+      }
+      #variables-form {
+        margin-bottom: 10px;
+      }
+      textarea {
+        width: 100%;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
-  <body>
-    <h1>LinkedInstant</h1>
-    <div id="variables-container"></div>
-    <button id="add-variable">Add Variable</button>
-    <textarea
-      id="template-message"
-      rows="15"
-      cols="50"
-      placeholder="Template message..."
-    ></textarea>
-    <button id="generate-message">Generate Message</button>
+  <body id="root">
+    <div class="title">
+      <h1>LinkedInstant</h1>
+    </div>
+    <div class="variables">
+      <div id="variables-container"></div>
+      <button id="add-variable">+</button>
+    </div>
+    <div class="text-area">
+      <textarea
+        id="template-message"
+        rows="15"
+        cols="50"
+        placeholder="Template message..."
+      ></textarea>
+    </div>
+    <div class="buttons">
+      <button id="autosend-message">Automatically Send</button>
+      <button id="copy-message">Copy Preview</button>
+      <button id="preview-message">Preview Message</button>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>

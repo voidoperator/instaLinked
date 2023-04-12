@@ -1,5 +1,7 @@
 document.getElementById("add-variable").addEventListener("click", addVariable);
-document.getElementById("generate-message").addEventListener("click", generateMessage);
+document.getElementById("autosend-message").addEventListener("click", generateMessage);
+document.getElementById("copy-message").addEventListener("click", copyPreviewMessage);
+document.getElementById("preview-message").addEventListener("click", togglePreview);
 
 function establishConnection(callback) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -35,6 +37,14 @@ function displayVariables(variables) {
   const variablesContainer = document.getElementById("variables-container");
   variablesContainer.innerHTML = ""; // Clear the container
 
+  const defaultVariableKeys = [
+    "TheirFullName",
+    "TheirFirstName",
+    "TheirLastName",
+    "TheirCompanyName",
+    "TheirPositionName"
+  ];
+
   for (const key in variables) {
     const variableWrapper = document.createElement("div");
 
@@ -45,6 +55,7 @@ function displayVariables(variables) {
 
     const variableLabel = document.createElement("label");
     variableLabel.textContent = key + ":";
+    variableWrapper.appendChild(variableLabel);
 
     // Copy template string
     const copyLabelButton = document.createElement("button");
@@ -72,6 +83,28 @@ function displayVariables(variables) {
     variableWrapper.appendChild(copyInputButton);
 
     variablesContainer.appendChild(variableWrapper);
+
+    // Add remove button for custom variables
+    if (!defaultVariableKeys.includes(key)) {
+      const removeVariableButton = document.createElement("button");
+      removeVariableButton.textContent = " - ";
+      removeVariableButton.addEventListener("click", function () {
+        // Remove the variable from the storage
+        chrome.storage.sync.get("customVariables", function (data) {
+          const customVariables = data.customVariables;
+          delete customVariables[key];
+          chrome.storage.sync.set({ customVariables }, function () {
+            console.log("Variable removed.");
+          });
+        });
+
+        // Remove the variable from the UI
+        variableWrapper.remove();
+      });
+      variableWrapper.appendChild(removeVariableButton);
+    }
+
+    variablesContainer.appendChild(variableWrapper);
   }
 }
 
@@ -79,10 +112,9 @@ async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
   } catch (e) {
-    console.eor("Failed to copy variable: ", err);
+    console.error("Failed to copy: ", e);
   }
 }
-
 
 function addVariable(event) {
   event.preventDefault();
@@ -105,9 +137,17 @@ function addVariable(event) {
   variableInput.placeholder = "Variable Value";
   variableWrapper.appendChild(variableInput);
 
+  // Add remove button for the new custom variable
+  const removeVariableButton = document.createElement("button");
+  removeVariableButton.textContent = " - ";
+  removeVariableButton.addEventListener("click", function () {
+    // Remove the variable from the UI
+    variableWrapper.remove();
+  });
+  variableWrapper.appendChild(removeVariableButton);
+
   variablesContainer.appendChild(variableWrapper);
 }
-
 
 function generateMessage() {
   const variablesContainer = document.getElementById("variables-container");
@@ -146,11 +186,63 @@ function generateMessage() {
     }
   });
 
-  console.log('modifiedMessage', modifiedMessage)
-
   chrome.storage.sync.set({ templateMessage, customVariables }, function () {
     console.log("Template message and custom variables saved.");
   });
+
+  return modifiedMessage;
+}
+
+async function copyPreviewMessage() {
+  const copyButton = document.getElementById('copy-message');
+  const previewMessage = await generateMessage();
+  copyToClipboard(previewMessage);
+  if (copyButton.textContent === 'Copy Preview') {
+    copyButton.textContent = 'Copied!';
+  } else {
+    copyButton.textContent = 'Copy Preview';
+  }
+}
+
+async function generatePreview() {
+  const previewMessage = await generateMessage();
+  const variablesContainer = document.getElementById("root");
+  const previewBox = document.createElement('div');
+  previewBox.id = 'preview-box';
+  const previewText = document.createElement('p');
+  previewText.innerText = previewMessage;
+  previewBox.appendChild(previewText);
+  variablesContainer.appendChild(previewBox);
+}
+
+let previewVisible = false;
+
+async function togglePreview() {
+  const previewBox = document.getElementById('preview-box');
+  const previewButton = document.getElementById('preview-message');
+  if (!previewBox) {
+    const variablesContainer = document.getElementById("root");
+    const newPreviewBox = document.createElement('div');
+    newPreviewBox.id = 'preview-box';
+    const previewText = document.createElement('p');
+    previewText.innerText = await generateMessage();
+    newPreviewBox.appendChild(previewText);
+    variablesContainer.appendChild(newPreviewBox);
+    previewButton.textContent = 'Hide Preview';
+    previewVisible = true;
+  } else {
+    if (previewVisible) {
+      previewBox.classList.add('hidden');
+      previewButton.textContent = 'Preview Message';
+      previewVisible = false;
+    } else {
+      const previewText = previewBox.querySelector('p');
+      previewText.innerText = await generateMessage();
+      previewBox.classList.remove('hidden');
+      previewButton.textContent = 'Hide Preview';
+      previewVisible = true;
+    }
+  }
 }
 
 // Load the last saved template message
@@ -159,4 +251,3 @@ chrome.storage.sync.get("templateMessage", function (data) {
     document.getElementById("template-message").value = data.templateMessage;
   }
 });
-
