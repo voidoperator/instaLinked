@@ -38,12 +38,12 @@
   }
 
   button {
-    @apply rounded-lg shadow-md bg-slate-700 py-1 px-2;
+    @apply bg-slate-700 px-2 py-1 rounded-lg shadow-md;
   }
 
   input,
   textarea {
-    @apply bg-black text-white;
+    @apply text-white bg-black;
   }
 
   .text-area {
@@ -55,24 +55,24 @@
   }
 
   #root {
-    @apply flex flex-col items-center justify-between overflow-x-hidden gap-4;
+    @apply flex flex-col items-center justify-between gap-4 overflow-x-hidden;
   }
 
   .title {
-    @apply text-2xl mt-4;
+    @apply flex flex-row gap-3 mt-4 text-2xl;
   }
 
   .buttons,
   .text-area,
   .title {
-    @apply flex flex-row items-center justify-evenly;
+    @apply justify-evenly flex flex-row items-center;
   }
 
   .buttons {
-    @apply mb-4 gap-4;
+    @apply gap-4 mb-4;
   }
   .buttons > button {
-    @apply shadow-lg text-sm hover:opacity-75 transition-all;
+    @apply hover:opacity-75 text-sm transition-all shadow-lg;
   }
   #variables-container > div > button {
     @apply hover:opacity-75 transition-all;
@@ -82,12 +82,12 @@
   }
 
   .add-var-wrapper {
-    @apply hover:opacity-80 transition-all my-2;
+    @apply hover:opacity-80 my-2 transition-all;
   }
 
   .add-var-wrapper,
   .add-var-wrapper > button {
-    @apply bg-slate-700 rounded-full w-10 h-10 flex items-center justify-center;
+    @apply bg-slate-700 flex items-center justify-center w-10 h-10 rounded-full;
   }
 
   button > svg {
@@ -102,33 +102,37 @@
     @apply flex flex-row items-center justify-between w-2/3;
   }
   #variables-container {
-    @apply w-full flex flex-col items-center gap-2;
-  }
-  .variableContainer {
-    @apply flex flex-row space-x-4 items-center justify-center;
+    @apply flex flex-col items-center w-full gap-2;
   }
 
   .custom-var-wrapper {
     @apply flex flex-row gap-4 py-1;
   }
 
-  .custom-var-wrapper > input {
-    @apply border border-white/50 rounded-lg p-2;
-  }
-
   .remove-var-button {
     @apply px-2 rounded-full;
   }
 
+  .variableContainer {
+    @apply flex flex-row items-center justify-center space-x-4 shadow-xl;
+  }
+
+  .variableContainer > input {
+    @apply rounded-xl px-2 py-1;
+  }
+
   .userInputContainer {
-    @apply flex flex-row space-x-4 items-center justify-center shadow-xl;
+    @apply flex flex-row items-center justify-center space-x-4 shadow-xl;
   }
 
   .userInputContainer > input {
-    @apply py-1 px-2 rounded-xl;
+    @apply rounded-xl px-2 py-1;
   }
 
   #preview-box {
-    @apply w-full text-base p-10 bg-slate-700 border-white border rounded-xl;
+    @apply bg-slate-700 rounded-xl w-full p-10 text-base border border-white;
+  }
+  .remove-var-button {
+    @apply px-4 font-extrabold;
   }
 }
