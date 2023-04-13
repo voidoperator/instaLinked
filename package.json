@@ -1,9 +1,9 @@
 {
-  "name": "linkedinstant",
+  "name": "instalinked",
   "version": "0.1",
-  "description": "LinkedInstant - Your LinkedIn assistant",
+  "description": "instaLinked - Your LinkedIn instant assistant!",
   "main": "content.js",
-  "repository": "https://github.com/voidoperator/linkedinstant.git",
+  "repository": "https://github.com/voidoperator/instaLinked",
   "author": "voidoperator <julionunez@me.com>",
   "license": "MIT",
   "scripts": {

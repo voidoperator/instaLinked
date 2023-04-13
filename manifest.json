@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "LinkedInstant",
-  "description": "LinkedInstant - Your LinkedIn assistant",
+  "name": "instaLinked",
+  "short_name": "instaLinked",
+  "description": "instaLinked- Your LinkedIn instant assistant!",
   "version": "0.1",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["https://www.linkedin.com/in/*"],

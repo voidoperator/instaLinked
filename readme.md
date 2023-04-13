@@ -1,3 +1,5 @@
 # chrome extension
 
-## LinkedInstant
+## instaLinked
+
+(docs coming soon)
