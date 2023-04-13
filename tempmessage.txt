@@ -1,0 +1,6 @@
+Hello {TheirFullName}!
+
+My name is {MyName}, I see you work at {TheirCompanyName} as a {TheirPositionName}. Good shit son.
+
+Sincerely,
+{MyFullName}

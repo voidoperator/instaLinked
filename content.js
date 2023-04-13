@@ -42,3 +42,55 @@ function extractVariables(variables) {
 
   return variables;
 }
+
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  if (request.action === "autoSendMessage") {
+    const success = await autoSendMessage(request.finalTemplateMessage);
+    chrome.runtime.sendMessage({ action: "autoSendResult", success });
+    return true;
+  }
+});
+
+async function autoSendMessage(finalTemplateMessage) {
+  const connectButton = document.querySelector('li-icon[type="connect"]');
+  let textAreaCheck;
+  try {
+    await connectButton.click();
+    const addANote = await waitForElement('button[aria-label="Add a note"]');
+    addANote.click();
+    const noteTextArea = await waitForElement('textarea[id="custom-message"]');
+    noteTextArea.value = finalTemplateMessage;
+    noteTextArea.dispatchEvent(new Event('input', { bubbles: true }));
+    textAreaCheck = noteTextArea;
+  } catch (error) {
+    console.log("Oops something went wrong: ", error);
+  }
+  return new Promise((resolve) => {
+    if (textAreaCheck.value.length > 0) {
+      resolve(true);
+    } else {
+      resolve(false);
+    }
+  });
+}
+
+function waitForElement(selector) {
+  return new Promise((resolve, reject) => {
+    const element = document.querySelector(selector);
+    if (element && !element.disabled && element.offsetParent !== null) {
+      resolve(element);
+    }
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        const nodes = Array.from(mutation.addedNodes);
+        for (const node of nodes) {
+          if (node.matches && node.matches(selector) && !node.disabled && node.offsetParent !== null) {
+            observer.disconnect();
+            resolve(node);
+          }
+        }
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+}

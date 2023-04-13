@@ -1,7 +1,25 @@
 document.getElementById("add-variable").addEventListener("click", addVariable);
-document.getElementById("autosend-message").addEventListener("click", generateMessage);
 document.getElementById("copy-message").addEventListener("click", copyPreviewMessage);
 document.getElementById("preview-message").addEventListener("click", togglePreview);
+
+document.getElementById("auto-send-message").addEventListener("click", () => {
+  const finalTemplateMessage = generateMessage();
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "autoSendMessage", finalTemplateMessage });
+
+    const handleMessage = (request) => {
+      if (request.action === "autoSendResult") {
+        if (request.success) {
+          window.close();
+        }
+        chrome.runtime.onMessage.removeListener(handleMessage);
+      }
+    };
+    chrome.runtime.onMessage.addListener(handleMessage);
+  });
+});
+
+
 
 function establishConnection(callback) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
