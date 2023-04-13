@@ -1,52 +1,69 @@
 chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name === "popup") {
+  if (port.name === 'popup') {
     port.onMessage.addListener(function (request) {
-      if (request.action === "requestVariables") {
+      if (request.action === 'requestVariables') {
         const variables = {
-          TheirFullName: "",
-          TheirFirstName: "",
-          TheirLastName: "",
-          TheirCompanyName: "",
-          TheirPositionName: "",
+          FullName: '',
+          FirstName: '',
+          LastName: '',
+          CompanyName: '',
+          PositionName: '',
         };
         const extractedVariables = extractVariables(variables);
-        port.postMessage({ action: "variablesResponse", variables: extractedVariables });
+        port.postMessage({
+          action: 'variablesResponse',
+          variables: extractedVariables,
+        });
       }
     });
   }
 });
 
 function extractVariables(variables) {
-  const userNameElement = document.querySelector(".pv-text-details__left-panel > div:first-child > h1");
+  const userNameElement = document.querySelector(
+    '.pv-text-details__left-panel > div:first-child > h1'
+  );
   if (userNameElement) {
     const fullName = userNameElement.innerText.trim();
-    const firstName = fullName.split(" ")[0];
-    const lastName = fullName.split(" ")[1];
+    const cleanName = fullName.replace(/\(.*?\)/g, '');
+    const cleanerName = cleanName.replace(/[^a-zA-Z\s]+|(\b[A-Z]+\b)/g, '');
+    const finalName = cleanerName.replace(/\s+/g, ' ').trim();
 
-    variables.TheirFullName = fullName;
-    variables.TheirFirstName = firstName;
-    variables.TheirLastName = lastName;
+    const firstName = finalName.split(' ')[0];
+    const lastName = finalName.split(' ')[1];
+
+    variables.FullName = finalName;
+    variables.FirstName = firstName;
+    variables.LastName = lastName;
   }
 
-  const experienceSectionElement = document.getElementById('experience').nextElementSibling.nextElementSibling;
+  const experienceSectionElement =
+    document.getElementById('experience').nextElementSibling.nextElementSibling;
   if (experienceSectionElement) {
-    const companyElement = document.querySelector('a[data-field="experience_company_logo"] > div > div > img');
+    const companyElement = document.querySelector(
+      'a[data-field="experience_company_logo"] > div > div > img'
+    );
     if (companyElement) {
-      variables.TheirCompanyName = companyElement.alt.split(' ').slice(0, -1).join(' ');
+      variables.CompanyName = companyElement.alt
+        .split(' ')
+        .slice(0, -1)
+        .join(' ');
     }
-    const positionElement = experienceSectionElement.querySelector('ul.pvs-list > li > div > div:nth-child(2) > div > div > div > span > span:first-child');
+    const positionElement = experienceSectionElement.querySelector(
+      'ul.pvs-list > li > div > div:nth-child(2) > div > div > div > span > span:first-child'
+    );
     if (positionElement) {
-      variables.TheirPositionName = positionElement.innerText;
+      variables.PositionName = positionElement.innerText;
     }
   }
 
   return variables;
 }
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.action === "autoSendMessage") {
+chrome.runtime.onMessage.addListener(async (request) => {
+  if (request.action === 'autoSendMessage') {
     const success = await autoSendMessage(request.finalTemplateMessage);
-    chrome.runtime.sendMessage({ action: "autoSendResult", success });
+    chrome.runtime.sendMessage({ action: 'autoSendResult', success });
     return true;
   }
 });
@@ -63,7 +80,7 @@ async function autoSendMessage(finalTemplateMessage) {
     noteTextArea.dispatchEvent(new Event('input', { bubbles: true }));
     textAreaCheck = noteTextArea;
   } catch (error) {
-    console.log("Oops something went wrong: ", error);
+    console.log('Oops something went wrong: ', error);
   }
   return new Promise((resolve) => {
     if (textAreaCheck.value.length > 0) {
@@ -75,7 +92,7 @@ async function autoSendMessage(finalTemplateMessage) {
 }
 
 function waitForElement(selector) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const element = document.querySelector(selector);
     if (element && !element.disabled && element.offsetParent !== null) {
       resolve(element);
@@ -84,7 +101,12 @@ function waitForElement(selector) {
       mutations.forEach((mutation) => {
         const nodes = Array.from(mutation.addedNodes);
         for (const node of nodes) {
-          if (node.matches && node.matches(selector) && !node.disabled && node.offsetParent !== null) {
+          if (
+            node.matches &&
+            node.matches(selector) &&
+            !node.disabled &&
+            node.offsetParent !== null
+          ) {
             observer.disconnect();
             resolve(node);
           }

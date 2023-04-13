@@ -2,30 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LinkedInstant</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        width: 500px;
-        height: 100%;
-      }
-      button {
-        margin-top: 10px;
-      }
-      #variables-form {
-        margin-bottom: 10px;
-      }
-      textarea {
-        width: 100%;
-      }
-      .hidden {
-        display: none;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body id="root">
     <div class="title">
@@ -33,13 +12,28 @@
     </div>
     <div class="variables">
       <div id="variables-container"></div>
-      <button id="add-variable">+</button>
+    </div>
+    <div class="add-var-wrapper" title="Add custom variable">
+      <button id="add-variable">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </button>
     </div>
     <div class="text-area">
       <textarea
+        rows="3"
         id="template-message"
-        rows="15"
-        cols="50"
         placeholder="Template message..."
       ></textarea>
     </div>
