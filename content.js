@@ -139,9 +139,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
-  if (details.frameId === 0) {
-    // Execute the checkProfileAndProcess function when the user navigates to a new profile
+window.addEventListener('popstate', function () {
+  const currentURL = window.location.href;
+  const profileURLPattern = /^https:\/\/www\.linkedin\.com\/in\/[^/]+\/?$/;
+
+  if (profileURLPattern.test(currentURL)) {
     checkProfileAndProcess();
   }
 });
