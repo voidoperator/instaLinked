@@ -8,22 +8,19 @@
     padding: 0;
     box-sizing: border-box;
   }
-
   *::-webkit-scrollbar {
     width: 0;
     height: 0;
   }
-
   html {
-    @apply bg-[#161616] rounded-3xl;
+    @apply bg-[#161616];
   }
-
   body {
+    @apply flex flex-col items-center justify-between gap-4 py-3 overflow-x-hidden;
     width: 800px;
     height: 600px;
     overflow-x: hidden;
   }
-
   h1,
   h2,
   h3,
@@ -36,67 +33,28 @@
   button {
     @apply text-white select-none;
   }
-
   button {
     @apply bg-slate-700 px-2 py-1 rounded-lg shadow-md;
   }
-
   input,
   textarea {
     @apply text-white bg-black;
   }
-
-  .text-area {
-    @apply w-full;
+  button > svg {
+    @apply w-10 h-10 text-white;
   }
-
-  #template-message {
-    @apply w-[90%] h-[150px] rounded-3xl p-4 shadow-xl text-sm;
+  label,
+  input[type='text'] {
+    @apply text-sm;
   }
-
-  #root {
-    @apply flex flex-col items-center justify-between gap-4 overflow-x-hidden;
-  }
-
-  .title {
-    @apply flex flex-row gap-3 mt-4 text-2xl;
-  }
-
   .buttons,
   .text-area,
   .title {
     @apply justify-evenly flex flex-row items-center;
   }
-
-  .buttons {
-    @apply gap-4 mb-4;
-  }
-  .buttons > button {
-    @apply hover:opacity-75 text-sm transition-all shadow-lg;
-  }
-  #variables-container > div > button {
-    @apply hover:opacity-75 transition-all;
-  }
-  .variables {
-    @apply flex flex-col items-center justify-center w-full;
-  }
-
-  .add-var-wrapper {
-    @apply hover:opacity-80 my-2 transition-all;
-  }
-
-  .add-var-wrapper,
-  .add-var-wrapper > button {
-    @apply bg-slate-700 flex items-center justify-center w-10 h-10 rounded-full;
-  }
-
-  button > svg {
-    @apply w-10 h-10 text-white;
-  }
-
-  label,
-  input[type='text'] {
-    @apply text-sm;
+  #variables-container > div > button,
+  .reload-button {
+    @apply hover:opacity-75 transition-all shadow-lg;
   }
   .var-wrapper {
     @apply flex flex-row items-center justify-between w-2/3;
@@ -104,35 +62,31 @@
   #variables-container {
     @apply flex flex-col items-center w-full gap-2;
   }
-
   .custom-var-wrapper {
     @apply flex flex-row gap-4 py-1;
   }
-
   .remove-var-button {
     @apply px-2 rounded-full;
   }
-
-  .variableContainer {
-    @apply flex flex-row items-center justify-center space-x-4 shadow-xl;
-  }
-
-  .variableContainer > input {
-    @apply rounded-xl px-2 py-1;
-  }
-
+  .variableContainer,
   .userInputContainer {
     @apply flex flex-row items-center justify-center space-x-4 shadow-xl;
   }
-
-  .userInputContainer > input {
+  .variableContainer > input {
     @apply rounded-xl px-2 py-1;
   }
-
-  #preview-box {
-    @apply bg-slate-700 rounded-xl w-full p-10 text-base border border-white;
+  .userInputContainer > input {
+    @apply rounded-xl px-2 py-1;
+    width: 275px;
   }
-  .remove-var-button {
-    @apply px-4 font-extrabold;
+  #preview-box {
+    @apply bg-slate-800 rounded-xl border-white/25 w-full p-10 text-base border;
+  }
+  .remove-var-button,
+  .reload-button > button {
+    @apply rounded-full;
+  }
+  .reload-button > button > svg {
+    @apply w-8 rounded-full;
   }
 }
