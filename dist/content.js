@@ -2,20 +2,43 @@ chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'popup') {
     port.onMessage.addListener(function (request) {
       if (request.action === 'requestVariables') {
-        const variables = {
-          FullName: '',
-          FirstName: '',
-          LastName: '',
-          CompanyName: '',
-          PositionName: '',
-        };
-        const extractedVariables = extractVariables(variables);
-        port.postMessage({
-          action: 'variablesResponse',
-          variables: extractedVariables,
-        });
+        checkProfileAndProcess(port);
       }
     });
+  }
+});
+
+function checkProfileAndProcess(port) {
+  const currentURL = window.location.href;
+  const profileURLPattern = /^https:\/\/www\.linkedin\.com\/in\/[^/]+\/?$/;
+  if (profileURLPattern.test(currentURL)) {
+    const variables = {
+      FullName: '',
+      FirstName: '',
+      LastName: '',
+      CompanyName: '',
+      PositionName: '',
+    };
+    const extractedVariables = extractVariables(variables);
+    port.postMessage({
+      success: true,
+      action: 'variablesResponse',
+      variables: extractedVariables,
+    });
+  } else {
+    port.postMessage({
+      success: false,
+      action: 'variablesResponse',
+      variables: {},
+    });
+  }
+}
+
+chrome.runtime.onMessage.addListener(async (request) => {
+  if (request.action === 'autoSendMessage') {
+    const success = await autoSendMessage(request.finalTemplateMessage);
+    chrome.runtime.sendMessage({ action: 'autoSendResult', success });
+    return true;
   }
 });
 
@@ -59,14 +82,6 @@ function extractVariables(variables) {
 
   return variables;
 }
-
-chrome.runtime.onMessage.addListener(async (request) => {
-  if (request.action === 'autoSendMessage') {
-    const success = await autoSendMessage(request.finalTemplateMessage);
-    chrome.runtime.sendMessage({ action: 'autoSendResult', success });
-    return true;
-  }
-});
 
 async function autoSendMessage(finalTemplateMessage) {
   const connectButton = document.querySelector('li-icon[type="connect"]');
@@ -116,3 +131,17 @@ function waitForElement(selector) {
     observer.observe(document.body, { childList: true, subtree: true });
   });
 }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'requestVariables') {
+    checkProfileAndProcess(sendResponse);
+    return true;
+  }
+});
+
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+  if (details.frameId === 0) {
+    // Execute the checkProfileAndProcess function when the user navigates to a new profile
+    checkProfileAndProcess();
+  }
+});

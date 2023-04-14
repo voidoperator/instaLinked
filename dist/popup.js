@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', checkIfVariablesAreLoaded);
 document.getElementById('add-variable').addEventListener('click', addVariable);
 document
   .getElementById('copy-message')
@@ -13,7 +14,6 @@ document.getElementById('auto-send-message').addEventListener('click', () => {
       action: 'autoSendMessage',
       finalTemplateMessage,
     });
-
     const handleMessage = (request) => {
       if (request.action === 'autoSendResult') {
         if (request.success) {
@@ -26,10 +26,24 @@ document.getElementById('auto-send-message').addEventListener('click', () => {
   });
 });
 
+document.getElementById('reload-variables').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const port = chrome.tabs.connect(tabs[0].id, { name: 'popup' });
+    port.postMessage({ action: 'requestVariables' });
+    port.onMessage.addListener((response) => {
+      if (response.success) {
+        displayVariables(response.variables);
+      } else {
+        console.error('Failed to fetch variables.');
+      }
+    });
+  });
+  checkIfVariablesAreLoaded();
+});
+
 function establishConnection(callback) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const port = chrome.tabs.connect(tabs[0].id, { name: 'popup' });
-
     port.onDisconnect.addListener(function () {
       if (chrome.runtime.lastError) {
         setTimeout(function () {
@@ -37,7 +51,6 @@ function establishConnection(callback) {
         }, 500);
       }
     });
-
     if (callback) {
       callback(port);
     }
@@ -56,9 +69,20 @@ establishConnection(function (port) {
   });
 });
 
+function checkIfVariablesAreLoaded() {
+  const variablesContainer = document.querySelector('#variables-container');
+  const reloadButton = document.querySelector('#reload-wrapper');
+
+  if (variablesContainer.hasChildNodes()) {
+    reloadButton.classList.add('hidden');
+  } else {
+    reloadButton.classList.remove('hidden');
+  }
+}
+
 function displayVariables(variables) {
   const variablesContainer = document.getElementById('variables-container');
-  variablesContainer.innerHTML = ''; // Clear the container
+  variablesContainer.innerHTML = '';
 
   const defaultVariableKeys = [
     'FullName',
@@ -140,6 +164,8 @@ function displayVariables(variables) {
 
     variablesContainer.appendChild(variableWrapper);
   }
+  // Check if any variables are loaded and show the reload button if there are none
+  checkIfVariablesAreLoaded();
 }
 
 async function copyToClipboard(text) {
