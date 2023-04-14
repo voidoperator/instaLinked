@@ -8,7 +8,7 @@ chrome.runtime.onConnect.addListener(function (port) {
   }
 });
 
-function checkProfileAndProcess(port) {
+function checkProfileAndProcess(port = null) {
   const currentURL = window.location.href;
   const profileURLPattern = /^https:\/\/www\.linkedin\.com\/in\/[^/]+\/?$/;
   if (profileURLPattern.test(currentURL)) {
@@ -20,17 +20,21 @@ function checkProfileAndProcess(port) {
       PositionName: '',
     };
     const extractedVariables = extractVariables(variables);
-    port.postMessage({
-      success: true,
-      action: 'variablesResponse',
-      variables: extractedVariables,
-    });
+    if (port) {
+      port.postMessage({
+        success: true,
+        action: 'variablesResponse',
+        variables: extractedVariables,
+      });
+    }
   } else {
-    port.postMessage({
-      success: false,
-      action: 'variablesResponse',
-      variables: {},
-    });
+    if (port) {
+      port.postMessage({
+        success: false,
+        action: 'variablesResponse',
+        variables: {},
+      });
+    }
   }
 }
 
@@ -139,9 +143,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
-  if (details.frameId === 0) {
-    // Execute the checkProfileAndProcess function when the user navigates to a new profile
+window.addEventListener('popstate', function () {
+  const currentURL = window.location.href;
+  const profileURLPattern = /^https:\/\/www\.linkedin\.com\/in\/[^/]+\/?$/;
+
+  if (profileURLPattern.test(currentURL)) {
     checkProfileAndProcess();
   }
 });
