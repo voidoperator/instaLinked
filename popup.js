@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', checkIfVariablesAreLoaded);
 document.getElementById('add-variable').addEventListener('click', addVariable);
 document
-  .getElementById('copy-message')
-  .addEventListener('click', copyPreviewMessage);
-document
   .getElementById('preview-message')
   .addEventListener('click', togglePreview);
+document.getElementById('copy-preview').addEventListener('click', async () => {
+  await copyPreviewMessage();
+});
+document.getElementById('copy-template').addEventListener('click', async () => {
+  await copyTemplateMessage();
+});
 
 document.getElementById('auto-send-message').addEventListener('click', () => {
   const finalTemplateMessage = generateMessage();
@@ -26,19 +29,23 @@ document.getElementById('auto-send-message').addEventListener('click', () => {
   });
 });
 
-document.getElementById('reload-variables').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const port = chrome.tabs.connect(tabs[0].id, { name: 'popup' });
-    port.postMessage({ action: 'requestVariables' });
-    port.onMessage.addListener((response) => {
-      if (response.success) {
-        displayVariables(response.variables);
-      } else {
-        console.error('Failed to fetch variables.');
-      }
+const reloadButtons = ['reload-variables', 'reset-variables'];
+reloadButtons.map((buttonId) => {
+  const button = document.getElementById(buttonId);
+  button.addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const port = chrome.tabs.connect(tabs[0].id, { name: 'popup' });
+      port.postMessage({ action: 'requestVariables' });
+      port.onMessage.addListener((response) => {
+        if (response.success) {
+          displayVariables(response.variables);
+        } else {
+          console.error('Failed to fetch variables.');
+        }
+      });
     });
+    checkIfVariablesAreLoaded();
   });
-  checkIfVariablesAreLoaded();
 });
 
 function establishConnection(callback) {
@@ -145,7 +152,8 @@ function displayVariables(variables) {
     // Add remove button for custom variables
     if (!defaultVariableKeys.includes(key)) {
       const removeVariableButton = document.createElement('button');
-      removeVariableButton.textContent = ' - ';
+      removeVariableButton.classList.add('remove-var-button');
+      removeVariableButton.textContent = ' — ';
       removeVariableButton.addEventListener('click', function () {
         // Remove the variable from the storage
         chrome.storage.sync.get('customVariables', function (data) {
@@ -159,7 +167,7 @@ function displayVariables(variables) {
         // Remove the variable from the UI
         variableWrapper.remove();
       });
-      variableWrapper.appendChild(removeVariableButton);
+      userInputContainer.appendChild(removeVariableButton);
     }
 
     variablesContainer.appendChild(variableWrapper);
@@ -209,7 +217,7 @@ function addVariable(event) {
 
   // Add remove button for the new custom variable
   const removeVariableButton = document.createElement('button');
-  removeVariableButton.textContent = ' - ';
+  removeVariableButton.textContent = ' — ';
   removeVariableButton.classList.add('remove-var-button');
   removeVariableButton.addEventListener('click', function () {
     // Remove the variable from the UI
@@ -283,14 +291,27 @@ function generateMessage() {
 }
 
 async function copyPreviewMessage() {
-  const copyButton = document.getElementById('copy-message');
+  const copyButton = document.getElementById('copy-preview');
   const previewMessage = await generateMessage();
-  copyToClipboard(previewMessage);
-  if (copyButton.textContent === 'Copy Preview') {
-    copyButton.textContent = 'Copied!';
-  } else {
-    copyButton.textContent = 'Copy Preview';
-  }
+  await copyToClipboard(previewMessage).then(() => {
+    if (copyButton.textContent.trim() === 'Copy Preview') {
+      copyButton.textContent = 'Preview copied!';
+    } else {
+      copyButton.textContent = 'Copy Preview';
+    }
+  });
+}
+
+async function copyTemplateMessage() {
+  const templateTextArea = document.getElementById('template-message');
+  const copyButton = document.getElementById('copy-template');
+  await copyToClipboard(templateTextArea.value).then(() => {
+    if (copyButton.textContent.trim() === 'Copy Template') {
+      copyButton.textContent = 'Template copied!';
+    } else {
+      copyButton.textContent = 'Copy Template';
+    }
+  });
 }
 
 let previewVisible = false;
@@ -323,7 +344,6 @@ async function togglePreview() {
   }
 }
 
-// Load the last saved template message
 chrome.storage.sync.get('templateMessage', function (data) {
   if (data.templateMessage) {
     document.getElementById('template-message').value = data.templateMessage;
