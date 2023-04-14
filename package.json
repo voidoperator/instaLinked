@@ -10,15 +10,18 @@
     "format": "yarn lint && yarn prettier",
     "lint": "eslint . --ext .js",
     "prettier": "prettier --write .",
-    "tailwind": "npx tailwindcss build -i tailwind.css -o style.css"
+    "tailwind": "postcss tailwind.css -o style.css"
   },
   "dependencies": {
+    "cssnano": "^6.0.0",
+    "postcss": "^8.4.21",
     "tailwindcss": "^3.3.1"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "postcss-cli": "^10.1.0",
     "prettier": "^2.8.7"
   }
 }
