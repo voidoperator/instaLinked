@@ -4,13 +4,14 @@
   "description": "instaLinked - Your LinkedIn instant assistant!",
   "main": "content.js",
   "repository": "https://github.com/voidoperator/instaLinked",
-  "author": "voidoperator <julionunez@me.com>",
+  "author": "voidoperator",
   "license": "MIT",
   "scripts": {
     "format": "yarn lint && yarn prettier",
     "lint": "eslint . --ext .js",
     "prettier": "prettier --write .",
-    "tailwind": "postcss tailwind.css -o style.css"
+    "tailwind": "postcss tailwind.css -o style.css",
+    "minify": "terser content.js --output content.min.js --compress --mangle && terser popup.js --output popup.min.js --compress --mangle"
   },
   "dependencies": {
     "cssnano": "^6.0.0",
@@ -22,6 +23,7 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "postcss-cli": "^10.1.0",
-    "prettier": "^2.8.7"
+    "prettier": "^2.8.7",
+    "terser": "^5.17.1"
   }
 }

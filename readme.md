@@ -34,6 +34,12 @@ Navigate to a LinkedIn profile you wish to connect with.
 Click the "Auto Send" button to automatically send a personalized connection request, or use the "Copy Preview" and "Copy Template" buttons to copy the generated message for manual use.
 <br>
 
+# Demo Video
+
+## `Demo: Installing & Using instaLinked`
+
+[![Video Thumbnail](https://img.youtube.com/vi/Kog1_ZtC4UA/0.jpg)](https://www.youtube.com/watch?v=Kog1_ZtC4UA)
+
 # Screenshots
 
 ## `Opened Extension`
